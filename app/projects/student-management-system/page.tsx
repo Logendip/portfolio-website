@@ -2,11 +2,20 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Projects from "@/components/Projects";
+
+const navigationItems = [
+  { label: "About", id: "about" },
+  { label: "Projects", id: "projects" },
+  { label: "Skills", id: "skills" },
+  { label: "Education", id: "education" },
+  { label: "Languages", id: "languages" },
+  { label: "Contact", id: "contact" },
+];
 
 const skillGroups = [
   {
@@ -87,10 +96,53 @@ const currentlyLearning = [
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("about");
+  const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+
+      setScrolled(scrollY > 30);
+
+      const documentHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      const progress =
+        documentHeight > 0 ? Math.min(scrollY / documentHeight, 1) : 0;
+
+      setScrollProgress(progress);
+
+      const sections = navigationItems
+        .map((item) => document.getElementById(item.id))
+        .filter((section): section is HTMLElement => section !== null);
+
+      let currentSection = "about";
+
+      for (const section of sections) {
+        const sectionTop = section.offsetTop;
+
+        if (scrollY >= sectionTop - 220) {
+          currentSection = section.id;
+        }
+      }
+
+      setActiveSection(currentSection);
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <main
@@ -106,65 +158,67 @@ export default function Home() {
         <div className="absolute bottom-[-200px] right-[-200px] h-[500px] w-[500px] rounded-full bg-purple-600/20 blur-[150px]" />
       </div>
 
+      {/* Scroll progress */}
+      <div className="fixed left-0 right-0 top-0 z-[60] h-[2px]">
+        <motion.div
+          className="h-full origin-left bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.9)]"
+          style={{
+            scaleX: scrollProgress,
+          }}
+        />
+      </div>
+
       {/* Navigation */}
-      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-white/5 bg-[#050505]/70 px-6 py-4 backdrop-blur-xl md:px-8 md:py-5">
+      <nav
+        className={`fixed left-0 right-0 top-0 z-50 px-6 transition-all duration-500 md:px-8 ${
+          scrolled
+            ? "border-b border-white/10 bg-[#050505]/95 py-3 shadow-[0_10px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+            : "border-b border-white/5 bg-[#050505]/70 py-5 backdrop-blur-xl"
+        }`}
+      >
         <div className="mx-auto flex max-w-6xl items-center justify-between">
+          {/* Logo */}
           <Link
             href="#top"
-            className="text-xl font-bold tracking-tight transition-transform hover:scale-105"
+            className="text-xl font-bold tracking-tight transition-transform duration-300 hover:scale-105"
           >
             RB<span className="text-blue-500">.</span>
           </Link>
 
           {/* Desktop navigation */}
-          <div className="hidden items-center gap-8 text-sm text-gray-400 md:flex">
-            <a
-              href="#about"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              About
-            </a>
+          <div className="hidden items-center gap-1 text-sm md:flex">
+            {navigationItems.map((item) => {
+              const isActive = activeSection === item.id;
 
-            <a
-              href="#projects"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Projects
-            </a>
+              return (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className={`group relative rounded-full px-4 py-2.5 transition-all duration-300 ${
+                    isActive
+                      ? "bg-blue-500/10 text-white"
+                      : "text-gray-500 hover:bg-white/[0.04] hover:text-gray-200"
+                  }`}
+                >
+                  <span className="relative z-10">{item.label}</span>
 
-            <a
-              href="#skills"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Skills
-            </a>
-
-            <a
-              href="#education"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Education
-            </a>
-
-            <a
-              href="#languages"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Languages
-            </a>
-
-            <a
-              href="#contact"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Contact
-            </a>
+                  <span
+                    className={`absolute bottom-1 left-1/2 h-[2px] -translate-x-1/2 rounded-full bg-blue-500 transition-all duration-300 ${
+                      isActive
+                        ? "w-6 opacity-100 shadow-[0_0_10px_rgba(59,130,246,0.8)]"
+                        : "w-0 opacity-0"
+                    }`}
+                  />
+                </a>
+              );
+            })}
           </div>
 
           {/* Availability */}
           <div className="hidden items-center gap-2 text-xs text-gray-500 sm:flex">
             <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
-            Available for opportunities
+
+            <span>Available for opportunities</span>
           </div>
 
           {/* Mobile menu button */}
@@ -173,6 +227,7 @@ export default function Home() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-gray-300 transition hover:border-blue-500/40 hover:text-white md:hidden"
             aria-label="Toggle navigation"
+            aria-expanded={mobileMenuOpen}
           >
             <div className="flex w-4 flex-col gap-1.5">
               <span
@@ -203,56 +258,37 @@ export default function Home() {
             height: mobileMenuOpen ? "auto" : 0,
             opacity: mobileMenuOpen ? 1 : 0,
           }}
+          transition={{
+            duration: 0.25,
+            ease: "easeInOut",
+          }}
           className="overflow-hidden md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-1 border-t border-white/5 pb-2 pt-4">
-            <a
-              href="#about"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              About
-            </a>
+            {navigationItems.map((item) => {
+              const isActive = activeSection === item.id;
 
-            <a
-              href="#projects"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Projects
-            </a>
+              return (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={closeMobileMenu}
+                  className={`rounded-xl px-4 py-3 text-sm transition-all duration-300 ${
+                    isActive
+                      ? "bg-blue-500/10 text-blue-400"
+                      : "text-gray-400 hover:bg-white/[0.04] hover:text-white"
+                  }`}
+                >
+                  <span className="flex items-center justify-between">
+                    {item.label}
 
-            <a
-              href="#skills"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Skills
-            </a>
-
-            <a
-              href="#education"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Education
-            </a>
-
-            <a
-              href="#languages"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Languages
-            </a>
-
-            <a
-              href="#contact"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Contact
-            </a>
+                    {isActive && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                    )}
+                  </span>
+                </a>
+              );
+            })}
           </div>
         </motion.div>
       </nav>
@@ -307,9 +343,7 @@ export default function Home() {
 
                 <div className="relative">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold">
-                      {group.title}
-                    </h3>
+                    <h3 className="text-xl font-semibold">{group.title}</h3>
 
                     <span className="text-blue-400 transition-transform duration-300 group-hover:translate-x-1">
                       →
@@ -593,14 +627,14 @@ export default function Home() {
 
               <div className="mt-10 flex flex-wrap gap-4">
                 <a
-                  href="mailto:ruslan.balatskyi@gmail.com"
+                  href="mailto:your-email@example.com"
                   className="rounded-full bg-white px-6 py-3 font-medium text-black transition-all duration-300 hover:scale-105 hover:bg-gray-200"
                 >
                   Send me an email
                 </a>
 
                 <a
-                  href="https://github.com/Logendip"
+                  href="#"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-full border border-white/15 px-6 py-3 font-medium text-white transition-all duration-300 hover:border-blue-500/50 hover:bg-blue-500/10"
@@ -646,4 +680,3 @@ export default function Home() {
     </main>
   );
 }
-
