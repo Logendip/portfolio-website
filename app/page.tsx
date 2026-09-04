@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Hero from "@/components/Hero";
 import About from "@/components/About";
@@ -85,19 +85,71 @@ const currentlyLearning = [
   "Docker",
 ];
 
+const navigationItems = [
+  { id: "top", label: "Home" },
+  { id: "about", label: "About" },
+  { id: "projects", label: "Projects" },
+  { id: "skills", label: "Skills" },
+  { id: "education", label: "Education" },
+  { id: "languages", label: "Languages" },
+  { id: "contact", label: "Contact" },
+];
+
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("top");
+
+  /*
+   * ACTIVE NAVIGATION
+   *
+   * Instead of IntersectionObserver we calculate
+   * which section is closest to the navbar.
+   *
+   * This works much more reliably with large sections
+   * such as Projects.
+   */
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 140;
+
+      let currentSection = "top";
+
+      for (const item of navigationItems) {
+        const section = document.getElementById(item.id);
+
+        if (!section) continue;
+
+        const sectionTop = section.offsetTop;
+
+        if (scrollPosition >= sectionTop) {
+          currentSection = item.id;
+        }
+      }
+
+      setActiveSection(currentSection);
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, []);
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
 
   return (
-    <main
-      id="top"
-      className="min-h-screen overflow-x-hidden bg-[#050505] text-white"
-    >
-      {/* Background */}
+    <main className="min-h-screen overflow-x-hidden bg-[#050505] text-white">
+      {/* BACKGROUND */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[-200px] top-[-200px] h-[500px] w-[500px] rounded-full bg-blue-600/20 blur-[150px]" />
 
@@ -106,9 +158,10 @@ export default function Home() {
         <div className="absolute bottom-[-200px] right-[-200px] h-[500px] w-[500px] rounded-full bg-purple-600/20 blur-[150px]" />
       </div>
 
-      {/* Navigation */}
+      {/* NAVIGATION */}
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-white/5 bg-[#050505]/70 px-6 py-4 backdrop-blur-xl md:px-8 md:py-5">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
+          {/* LOGO */}
           <Link
             href="#top"
             className="text-xl font-bold tracking-tight transition-transform hover:scale-105"
@@ -116,58 +169,47 @@ export default function Home() {
             RB<span className="text-blue-500">.</span>
           </Link>
 
-          {/* Desktop navigation */}
-          <div className="hidden items-center gap-8 text-sm text-gray-400 md:flex">
-            <a
-              href="#about"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              About
-            </a>
+          {/* DESKTOP NAVIGATION */}
+          <div className="hidden items-center gap-7 md:flex">
+            {navigationItems.map((item) => {
+              const isActive = activeSection === item.id;
 
-            <a
-              href="#projects"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Projects
-            </a>
+              return (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className={`relative py-1 text-sm transition-colors duration-300 ${
+                    isActive
+                      ? "text-blue-400"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  {item.label}
 
-            <a
-              href="#skills"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Skills
-            </a>
-
-            <a
-              href="#education"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Education
-            </a>
-
-            <a
-              href="#languages"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Languages
-            </a>
-
-            <a
-              href="#contact"
-              className="transition-colors duration-300 hover:text-white"
-            >
-              Contact
-            </a>
+                  <motion.span
+                    initial={false}
+                    animate={{
+                      width: isActive ? "100%" : "0%",
+                      opacity: isActive ? 1 : 0,
+                    }}
+                    transition={{
+                      duration: 0.25,
+                      ease: "easeOut",
+                    }}
+                    className="absolute -bottom-1 left-0 h-px bg-blue-400"
+                  />
+                </a>
+              );
+            })}
           </div>
 
-          {/* Availability */}
+          {/* AVAILABILITY */}
           <div className="hidden items-center gap-2 text-xs text-gray-500 sm:flex">
             <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
             Available for opportunities
           </div>
 
-          {/* Mobile menu button */}
+          {/* MOBILE MENU BUTTON */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -177,7 +219,9 @@ export default function Home() {
             <div className="flex w-4 flex-col gap-1.5">
               <span
                 className={`h-px w-full bg-current transition-transform ${
-                  mobileMenuOpen ? "translate-y-[4px] rotate-45" : ""
+                  mobileMenuOpen
+                    ? "translate-y-[4px] rotate-45"
+                    : ""
                 }`}
               />
 
@@ -189,14 +233,16 @@ export default function Home() {
 
               <span
                 className={`h-px w-full bg-current transition-transform ${
-                  mobileMenuOpen ? "-translate-y-[4px] -rotate-45" : ""
+                  mobileMenuOpen
+                    ? "-translate-y-[4px] -rotate-45"
+                    : ""
                 }`}
               />
             </div>
           </button>
         </div>
 
-        {/* Mobile navigation */}
+        {/* MOBILE NAVIGATION */}
         <motion.div
           initial={false}
           animate={{
@@ -206,68 +252,56 @@ export default function Home() {
           className="overflow-hidden md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-1 border-t border-white/5 pb-2 pt-4">
-            <a
-              href="#about"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              About
-            </a>
+            {navigationItems.map((item) => {
+              const isActive = activeSection === item.id;
 
-            <a
-              href="#projects"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Projects
-            </a>
+              return (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={closeMobileMenu}
+                  className={`relative rounded-xl px-4 py-3 text-sm transition-all duration-300 ${
+                    isActive
+                      ? "bg-blue-500/10 text-blue-400"
+                      : "text-gray-400 hover:bg-white/[0.04] hover:text-white"
+                  }`}
+                >
+                  {item.label}
 
-            <a
-              href="#skills"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Skills
-            </a>
-
-            <a
-              href="#education"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Education
-            </a>
-
-            <a
-              href="#languages"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Languages
-            </a>
-
-            <a
-              href="#contact"
-              onClick={closeMobileMenu}
-              className="rounded-xl px-4 py-3 text-sm text-gray-400 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              Contact
-            </a>
+                  <motion.span
+                    initial={false}
+                    animate={{
+                      width: isActive ? "32px" : "0px",
+                      opacity: isActive ? 1 : 0,
+                    }}
+                    transition={{
+                      duration: 0.25,
+                    }}
+                    className="absolute bottom-1 left-4 h-px bg-blue-400"
+                  />
+                </a>
+              );
+            })}
           </div>
         </motion.div>
       </nav>
 
-      {/* Hero */}
-      <Hero />
+      {/* HERO */}
+      <section id="top" className="scroll-mt-24">
+        <Hero />
+      </section>
 
-      {/* About */}
+      {/* ABOUT */}
       <About />
 
-      {/* Projects */}
+      {/* PROJECTS */}
       <Projects />
 
-      {/* Skills */}
-      <section id="skills" className="relative px-6 py-28 md:px-8 md:py-32">
+      {/* SKILLS */}
+      <section
+        id="skills"
+        className="relative scroll-mt-24 px-6 py-28 md:px-8 md:py-32"
+      >
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -337,10 +371,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Education */}
+      {/* EDUCATION */}
       <section
         id="education"
-        className="relative border-y border-white/10 px-6 py-28 md:px-8 md:py-32"
+        className="relative scroll-mt-24 border-y border-white/10 px-6 py-28 md:px-8 md:py-32"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -395,10 +429,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Languages */}
+      {/* LANGUAGES */}
       <section
         id="languages"
-        className="relative px-6 py-28 md:px-8 md:py-32"
+        className="relative scroll-mt-24 px-6 py-28 md:px-8 md:py-32"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -482,7 +516,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Currently Learning */}
+      {/* CURRENTLY LEARNING */}
       <section
         id="learning"
         className="relative border-y border-white/10 px-6 py-28 md:px-8 md:py-32"
@@ -560,27 +594,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact */}
+      {/* CONTACT */}
       <section
         id="contact"
-        className="relative border-t border-white/10 px-6 py-28 md:px-8 md:py-32"
+        className="relative scroll-mt-24 border-t border-white/10 px-6 py-28 md:px-8 md:py-32"
       >
         <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.7 }}
-            className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm md:p-16"
-          >
-            <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-blue-600/10 blur-[100px]" />
-
-            <div className="relative">
+          <div className="grid items-center gap-12 lg:grid-cols-[1fr_0.9fr]">
+            {/* LEFT SIDE */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.6 }}
+            >
               <p className="text-sm uppercase tracking-[0.3em] text-blue-400">
                 Contact
               </p>
 
-              <h2 className="mt-4 max-w-3xl text-4xl font-bold md:text-6xl">
+              <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-6xl">
                 Let&apos;s build
                 <br />
                 <span className="text-gray-500">something.</span>
@@ -592,37 +624,263 @@ export default function Home() {
               </p>
 
               <div className="mt-10 flex flex-wrap gap-4">
+                {/* EMAIL */}
                 <a
                   href="mailto:ruslan.balatskyi@gmail.com"
-                  className="rounded-full bg-white px-6 py-3 font-medium text-black transition-all duration-300 hover:scale-105 hover:bg-gray-200"
+                  className="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 font-medium text-black transition-all duration-300 hover:scale-105 hover:bg-gray-200"
                 >
-                  Send me an email
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                  >
+                    <rect
+                      x="3"
+                      y="5"
+                      width="18"
+                      height="14"
+                      rx="2"
+                    />
+
+                    <path d="m3 7 9 6 9-6" />
+                  </svg>
+
+                  Email me
+
+                  <span className="transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
                 </a>
 
+                {/* GITHUB */}
                 <a
                   href="https://github.com/Logendip"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full border border-white/15 px-6 py-3 font-medium text-white transition-all duration-300 hover:border-blue-500/50 hover:bg-blue-500/10"
+                  className="inline-flex items-center gap-3 rounded-full border border-white/15 px-6 py-3 font-medium text-white transition-all duration-300 hover:border-blue-500/50 hover:bg-blue-500/10"
                 >
-                  GitHub ↗
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.16c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.25 3.33.96.1-.74.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.18-3.1.73.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.25 5.69.41.35.78 1.04.78 2.1v3.11c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+                  </svg>
+
+                  GitHub
                 </a>
 
+                {/* LINKEDIN */}
                 <a
                   href="#"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full border border-white/15 px-6 py-3 font-medium text-white transition-all duration-300 hover:border-blue-500/50 hover:bg-blue-500/10"
+                  className="inline-flex items-center gap-3 rounded-full border border-white/15 px-6 py-3 font-medium text-white transition-all duration-300 hover:border-blue-500/50 hover:bg-blue-500/10"
                 >
                   LinkedIn ↗
                 </a>
               </div>
+            </motion.div>
+
+            {/* PAPER AIRPLANE */}
+            <div className="relative hidden h-[330px] overflow-hidden rounded-3xl border border-white/5 bg-white/[0.015] lg:block">
+              {/* Ambient glow */}
+              <div className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/10 blur-3xl" />
+
+              {/* Decorative grid */}
+              <div
+                className="absolute inset-0 opacity-[0.12]"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(rgba(148,163,184,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.15) 1px, transparent 1px)",
+                  backgroundSize: "32px 32px",
+                }}
+              />
+
+              {/* Small particles */}
+              <motion.span
+                animate={{
+                  opacity: [0.15, 0.8, 0.15],
+                  scale: [0.8, 1.2, 0.8],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute left-[22%] top-[30%] h-1 w-1 rounded-full bg-blue-300"
+              />
+
+              <motion.span
+                animate={{
+                  opacity: [0.1, 0.7, 0.1],
+                  scale: [0.8, 1.3, 0.8],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: 0.8,
+                  ease: "easeInOut",
+                }}
+                className="absolute right-[22%] top-[25%] h-1.5 w-1.5 rounded-full bg-cyan-300"
+              />
+
+              <motion.span
+                animate={{
+                  opacity: [0.1, 0.6, 0.1],
+                  scale: [0.8, 1.2, 0.8],
+                }}
+                transition={{
+                  duration: 2.8,
+                  repeat: Infinity,
+                  delay: 1.4,
+                  ease: "easeInOut",
+                }}
+                className="absolute bottom-[25%] left-[30%] h-1 w-1 rounded-full bg-blue-400"
+              />
+
+              {/* Flight path */}
+              <svg
+                className="absolute inset-0 h-full w-full"
+                viewBox="0 0 600 330"
+                fill="none"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M20 285 C110 90, 205 285, 305 155 C380 55, 475 100, 580 35"
+                  stroke="rgba(96,165,250,0.16)"
+                  strokeWidth="1.5"
+                  strokeDasharray="5 9"
+                />
+
+                <path
+                  d="M20 285 C110 90, 205 285, 305 155 C380 55, 475 100, 580 35"
+                  stroke="rgba(96,165,250,0.35)"
+                  strokeWidth="1"
+                  strokeDasharray="2 14"
+                />
+              </svg>
+
+              {/* AIRPLANE */}
+              <motion.div
+                className="absolute left-0 top-0 z-10"
+                initial={{
+                  x: -60,
+                  y: 220,
+                  opacity: 1,
+                  rotate: -25,
+                }}
+                animate={{
+                  x: [
+                    -60,
+                    40,
+                    150,
+                    260,
+                    390,
+                    520,
+                    700,
+                  ],
+                  y: [
+                    220,
+                    120,
+                    210,
+                    95,
+                    70,
+                    35,
+                    -30,
+                  ],
+                  rotate: [
+                    -25,
+                    18,
+                    -10,
+                    16,
+                    7,
+                    -8,
+                    -10,
+                  ],
+                  opacity: [
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                  ],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  repeatDelay: 1,
+                  ease: "easeInOut",
+                  times: [
+                    0,
+                    0.14,
+                    0.30,
+                    0.47,
+                    0.65,
+                    0.82,
+                    1,
+                  ],
+                }}
+              >
+                {/* Airplane glow */}
+                <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-400/20 blur-xl" />
+
+                {/* Airplane */}
+                <svg
+                  width="92"
+                  height="92"
+                  viewBox="0 0 100 100"
+                  fill="none"
+                  className="relative drop-shadow-[0_0_12px_rgba(96,165,250,0.55)]"
+                >
+                  <path
+                    d="M82 18 17 45c-2.4 1-2.3 4.4.2 5.2l25.1 8.2 8.2 25.1c.8 2.5 4.2 2.6 5.2.2L82 18Z"
+                    fill="rgba(15,23,42,0.92)"
+                    stroke="rgba(147,197,253,0.95)"
+                    strokeWidth="2"
+                  />
+
+                  <path
+                    d="m17 45 36.5 13.4L82 18"
+                    stroke="rgba(96,165,250,0.9)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  <path
+                    d="m53.5 58.4 2.9 25.3"
+                    stroke="rgba(125,211,252,0.7)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+
+                  <path
+                    d="m53.5 58.4 14.8-18.1"
+                    stroke="rgba(191,219,254,0.6)"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </motion.div>
+
+              {/* Small label */}
+              <div className="absolute bottom-5 left-6 flex items-center gap-2 text-xs text-gray-600">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-400/60" />
+                Let&apos;s connect
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* FOOTER */}
       <footer className="border-t border-white/10 px-6 py-8 md:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -646,4 +904,3 @@ export default function Home() {
     </main>
   );
 }
-
