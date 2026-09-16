@@ -13,11 +13,47 @@ type Project = {
   type: string;
   status: string;
   features: string[];
+  github?: string;
+  githubBackend?: string;
+  githubFrontend?: string;
 };
 
 const projects: Project[] = [
   {
     number: "01",
+    title: "Freegram",
+    description:
+      "Full-stack real-time messenger application with authentication, private chats, groups, chat requests and live messaging.",
+    technologies: [
+      "C#",
+      ".NET 9",
+      "ASP.NET Core",
+      "PostgreSQL",
+      "React",
+      "JavaScript",
+      "SignalR",
+    ],
+    type: "Full-Stack Application",
+    status: "In Development",
+    githubBackend: "https://github.com/Logendip/Freegram-Backend",
+    githubFrontend: "https://github.com/Logendip/Freegram-Frontend",
+    features: [
+      "User registration and login",
+      "JWT authentication",
+      "Private conversations",
+      "Real-time messaging with SignalR",
+      "Group chats",
+      "Chat requests",
+      "Group invitations",
+      "Unread message counter",
+      "Read receipts",
+      "Delete messages for everyone or for yourself",
+      "User search",
+      "Responsive messenger interface",
+    ],
+  },
+  {
+    number: "02",
     title: "Student Management System",
     description:
       "Desktop application for managing student information, personal data, addresses and study years.",
@@ -34,7 +70,7 @@ const projects: Project[] = [
     ],
   },
   {
-    number: "02",
+    number: "03",
     title: "Room Reservation System",
     description:
       "University room reservation application with rooms, departments, lecturers and conflict detection.",
@@ -51,10 +87,10 @@ const projects: Project[] = [
     ],
   },
   {
-    number: "03",
+    number: "04",
     title: "Quiz Application",
     description:
-      "Interactive desktop quiz application with questions, answers and a modern graphical interface.",
+      "Interactive desktop quiz application with questions, answers and a graphical user interface.",
     technologies: ["C#", ".NET", "WPF", "XAML"],
     type: "Desktop Application",
     status: "Completed",
@@ -68,7 +104,7 @@ const projects: Project[] = [
     ],
   },
   {
-    number: "04",
+    number: "05",
     title: "2D RPG Game",
     description:
       "2D RPG-style game focused on player movement, game logic, graphics and interactive elements.",
@@ -84,6 +120,22 @@ const projects: Project[] = [
       "CMake project configuration",
     ],
   },
+  {
+    number: "06",
+    title: "Frontend Likarnyam",
+    description:
+      "Frontend web project developed with TypeScript, focused on building a modern web interface.",
+    technologies: ["TypeScript", "React", "Frontend"],
+    type: "Web Application",
+    status: "Completed",
+    github: "https://github.com/Logendip/frontend-likarnyam",
+    features: [
+      "TypeScript-based frontend",
+      "Component-based architecture",
+      "Responsive interface",
+      "Modern web development approach",
+    ],
+  },
 ];
 
 export default function Projects() {
@@ -93,7 +145,10 @@ export default function Projects() {
 
   return (
     <>
-      <section id="projects" className="relative px-6 py-28 md:px-8 md:py-32">
+      <section
+        id="projects"
+        className="relative px-6 py-28 md:px-8 md:py-32"
+      >
         <div className="mx-auto max-w-6xl">
           {/* Heading */}
           <motion.div
@@ -112,7 +167,8 @@ export default function Projects() {
 
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-gray-500">
               A selection of projects I&apos;ve worked on while studying
-              software development and exploring different technologies.
+              software development and building applications with different
+              technologies.
             </p>
           </motion.div>
 
@@ -129,18 +185,16 @@ export default function Projects() {
                   delay: index * 0.1,
                 }}
                 whileHover={{ y: -8 }}
-                className="h-full"
+                className={`h-full ${
+                  index === 0 ? "md:col-span-2" : ""
+                }`}
               >
-                <button
-                  type="button"
-                  onClick={() => setSelectedProject(project)}
-                  className="group relative flex h-full w-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-left backdrop-blur-sm transition-colors duration-300 hover:border-blue-500/40"
-                >
+                <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-colors duration-300 hover:border-blue-500/40 md:p-10">
                   {/* Glow */}
-                  <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-600/10 blur-3xl transition-all duration-500 group-hover:bg-blue-600/20" />
+                  <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-blue-600/10 blur-3xl transition-all duration-500 group-hover:bg-blue-600/20" />
 
                   {/* Header */}
-                  <div className="relative flex items-start justify-between">
+                  <div className="relative flex items-start justify-between gap-4">
                     <span className="text-sm font-medium text-blue-400">
                       {project.number}
                     </span>
@@ -151,12 +205,12 @@ export default function Projects() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="relative mt-10 text-2xl font-bold md:text-3xl">
+                  <h3 className="relative mt-8 text-3xl font-bold md:text-4xl">
                     {project.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="relative mt-4 min-h-[90px] text-base leading-relaxed text-gray-500">
+                  <p className="relative mt-4 max-w-3xl text-base leading-relaxed text-gray-500 md:text-lg">
                     {project.description}
                   </p>
 
@@ -174,30 +228,84 @@ export default function Projects() {
 
                   {/* Bottom */}
                   <div className="relative mt-auto pt-8">
-                    <div className="flex items-center justify-between border-t border-white/10 pt-6">
+                    <div className="flex flex-col gap-5 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                      {/* Status */}
                       <div className="flex items-center gap-3">
-                        <span className="h-2 w-2 rounded-full bg-green-400" />
+                        <span
+                          className={`h-2 w-2 rounded-full ${
+                            project.status === "Completed"
+                              ? "bg-green-400"
+                              : "bg-yellow-400"
+                          }`}
+                        />
 
                         <span className="text-sm text-gray-600 transition-colors duration-300 group-hover:text-gray-400">
                           {project.status}
                         </span>
                       </div>
 
-                      <motion.div
-                        whileHover={{
-                          scale: 1.15,
-                          rotate: -5,
-                        }}
-                        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-gray-400 transition-all duration-300 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 group-hover:text-white"
-                      >
-                        <span className="text-lg">→</span>
-                      </motion.div>
+                      {/* Buttons */}
+                      <div className="flex flex-wrap items-center gap-3">
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(event) => event.stopPropagation()}
+                            className="rounded-full border border-white/10 px-4 py-2 text-sm text-gray-400 transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white"
+                          >
+                            GitHub ↗
+                          </a>
+                        )}
+
+                        {project.githubBackend && (
+                          <a
+                            href={project.githubBackend}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(event) => event.stopPropagation()}
+                            className="rounded-full border border-white/10 px-4 py-2 text-sm text-gray-400 transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white"
+                          >
+                            Backend ↗
+                          </a>
+                        )}
+
+                        {project.githubFrontend && (
+                          <a
+                            href={project.githubFrontend}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(event) => event.stopPropagation()}
+                            className="rounded-full border border-white/10 px-4 py-2 text-sm text-gray-400 transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white"
+                          >
+                            Frontend ↗
+                          </a>
+                        )}
+
+                        {/* Open project */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProject(project)}
+                          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-gray-400 transition-all duration-300 hover:border-blue-500/50 hover:bg-blue-500/10 hover:text-white"
+                          aria-label={`Open ${project.title}`}
+                        >
+                          <motion.span
+                            whileHover={{
+                              scale: 1.15,
+                              rotate: -5,
+                            }}
+                            className="text-lg"
+                          >
+                            →
+                          </motion.span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   {/* Bottom glow line */}
                   <div className="absolute bottom-0 left-0 h-px w-0 bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)] transition-all duration-500 group-hover:w-full" />
-                </button>
+                </div>
               </motion.div>
             ))}
           </div>
