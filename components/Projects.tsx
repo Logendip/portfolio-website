@@ -16,6 +16,8 @@ type Project = {
   github?: string;
   githubBackend?: string;
   githubFrontend?: string;
+  liveDemo?: string;
+  nickname?: string;
 };
 
 const projects: Project[] = [
@@ -23,7 +25,7 @@ const projects: Project[] = [
     number: "01",
     title: "Freegram",
     description:
-      "Full-stack real-time messenger application with authentication, private chats, groups, chat requests and live messaging.",
+      "Full-stack real-time messenger application with authentication, private chats, groups, chat requests and live messaging. The application is available online and uses the nickname Logendip.",
     technologies: [
       "C#",
       ".NET 9",
@@ -37,6 +39,8 @@ const projects: Project[] = [
     status: "In Development",
     githubBackend: "https://github.com/Logendip/Freegram-Backend",
     githubFrontend: "https://github.com/Logendip/Freegram-Frontend",
+    liveDemo: "https://freegram-frontend.vercel.app/",
+    nickname: "Logendip",
     features: [
       "User registration and login",
       "JWT authentication",
@@ -54,74 +58,6 @@ const projects: Project[] = [
   },
   {
     number: "02",
-    title: "Student Management System",
-    description:
-      "Desktop application for managing student information, personal data, addresses and study years.",
-    technologies: ["C#", ".NET", "Windows Forms", "JSON"],
-    type: "Desktop Application",
-    status: "Completed",
-    features: [
-      "Student information management",
-      "Personal data and address handling",
-      "Study year selection",
-      "Input validation",
-      "JSON serialization",
-      "GUID-based student identification",
-    ],
-  },
-  {
-    number: "03",
-    title: "Room Reservation System",
-    description:
-      "University room reservation application with rooms, departments, lecturers and conflict detection.",
-    technologies: ["C#", ".NET", "Windows Forms", "OOP"],
-    type: "University Project",
-    status: "Completed",
-    features: [
-      "Room management",
-      "Department management",
-      "Lecturer management",
-      "Reservation management",
-      "Reservation conflict detection",
-      "Object-oriented architecture",
-    ],
-  },
-  {
-    number: "04",
-    title: "Quiz Application",
-    description:
-      "Interactive desktop quiz application with questions, answers and a graphical user interface.",
-    technologies: ["C#", ".NET", "WPF", "XAML"],
-    type: "Desktop Application",
-    status: "Completed",
-    features: [
-      "Interactive quiz interface",
-      "Question and answer handling",
-      "Graphical user interface",
-      "WPF-based application",
-      "XAML interface design",
-      "Application logic in C#",
-    ],
-  },
-  {
-    number: "05",
-    title: "2D RPG Game",
-    description:
-      "2D RPG-style game focused on player movement, game logic, graphics and interactive elements.",
-    technologies: ["C++", "SFML", "CMake"],
-    type: "Game Development",
-    status: "In Development",
-    features: [
-      "2D player movement",
-      "Game state and logic",
-      "Interactive game elements",
-      "Graphics rendering",
-      "SFML-based development",
-      "CMake project configuration",
-    ],
-  },
-  {
-    number: "06",
     title: "Frontend Likarnyam",
     description:
       "Frontend web project developed with TypeScript, focused on building a modern web interface.",
@@ -167,8 +103,7 @@ export default function Projects() {
 
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-gray-500">
               A selection of projects I&apos;ve worked on while studying
-              software development and building applications with different
-              technologies.
+              software development and exploring different technologies.
             </p>
           </motion.div>
 
@@ -214,6 +149,19 @@ export default function Projects() {
                     {project.description}
                   </p>
 
+                  {/* Nickname */}
+                  {project.nickname && (
+                    <div className="relative mt-5 flex items-center gap-2">
+                      <span className="text-sm text-gray-600">
+                        In-app nickname:
+                      </span>
+
+                      <span className="font-medium text-blue-400">
+                        {project.nickname}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Technologies */}
                   <div className="relative mt-8 flex flex-wrap gap-2">
                     {project.technologies.map((technology) => (
@@ -244,17 +192,17 @@ export default function Projects() {
                         </span>
                       </div>
 
-                      {/* Buttons */}
+                      {/* Links */}
                       <div className="flex flex-wrap items-center gap-3">
-                        {project.github && (
+                        {project.liveDemo && (
                           <a
-                            href={project.github}
+                            href={project.liveDemo}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(event) => event.stopPropagation()}
-                            className="rounded-full border border-white/10 px-4 py-2 text-sm text-gray-400 transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white"
+                            className="rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-2 text-sm text-blue-400 transition-all duration-300 hover:border-blue-500/60 hover:bg-blue-500/20 hover:text-white"
                           >
-                            GitHub ↗
+                            Live Demo ↗
                           </a>
                         )}
 
@@ -279,6 +227,18 @@ export default function Projects() {
                             className="rounded-full border border-white/10 px-4 py-2 text-sm text-gray-400 transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white"
                           >
                             Frontend ↗
+                          </a>
+                        )}
+
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(event) => event.stopPropagation()}
+                            className="rounded-full border border-white/10 px-4 py-2 text-sm text-gray-400 transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white"
+                          >
+                            GitHub ↗
                           </a>
                         )}
 
