@@ -120,9 +120,7 @@ export default function Projects() {
                   delay: index * 0.1,
                 }}
                 whileHover={{ y: -8 }}
-                className={`h-full ${
-                  index === 0 ? "md:col-span-2" : ""
-                }`}
+                className="h-full"
               >
                 <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-colors duration-300 hover:border-blue-500/40 md:p-10">
                   {/* Glow */}
